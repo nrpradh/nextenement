@@ -8,6 +8,7 @@ export async function fetchRequests(filters = {}) {
   if (filters.search) params.search = filters.search
 
   const { data } = await apiClient.get('/requests', { params })
+  console.log('FULL API RESPONSE:', JSON.stringify(data,null, 2))
   return data
 }
 

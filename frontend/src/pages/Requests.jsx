@@ -9,7 +9,20 @@ import RequestFilters from '../components/RequestFilters'
 export default function Requests() {
   const { user } = useAuth()
   const [filters, setFilters] = useState({})
-  const { data: requests, isLoading } = useRequestsList(user.role === 'manager' ? filters : {})
+  const { data, isLoading } = useRequestsList(
+    user.role === 'manager' ? filters : {}
+  )
+
+  const requests = Array.isArray(data)
+    ? data
+    : data?.requests ?? []
+
+  const counts = Array.isArray(data)
+    ? {}
+    : data?.counts ?? {}
+
+  // console.log(JSON.stringify(requests, null, 2))
+
 
   return (
     <Box>
@@ -23,7 +36,11 @@ export default function Requests() {
       </Flex>
 
       {user.role === 'manager' && (
-        <RequestFilters filters={filters} onChange={setFilters} />
+        <RequestFilters
+          filters={filters}
+          onChange={setFilters}
+          counts={counts}
+        />
       )}
 
       {isLoading ? (

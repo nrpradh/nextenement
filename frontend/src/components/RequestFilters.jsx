@@ -1,32 +1,35 @@
 import { HStack, Input, Select, createListCollection, Button } from '@chakra-ui/react'
 import { RotateCcw } from 'lucide-react'
 
-const statuses = createListCollection({
-  items: [
-    { label: 'Pending', value: 'Pending' },
-    { label: 'In Progress', value: 'In Progress' },
-    { label: 'Resolved', value: 'Resolved' },
-  ],
-})
+const statuses = (counts) =>
+  createListCollection({
+    items: [
+      { label: `Pending (${counts.statuses?.Pending || 0})`, value: 'Pending' },
+      { label: `In Progress (${counts.statuses?.['In Progress'] || 0})`, value: 'In Progress' },
+      { label: `Resolved (${counts.statuses?.Resolved || 0})`, value: 'Resolved' },
+    ],
+  })
 
-const priorities = createListCollection({
-  items: [
-    { label: 'Low', value: 'Low' },
-    { label: 'Medium', value: 'Medium' },
-    { label: 'High', value: 'High' },
-  ],
-})
+const priorities = (counts) =>
+  createListCollection({
+    items: [
+      { label: `Low (${counts.priorities?.Low || 0})`, value: 'Low' },
+      { label: `Medium (${counts.priorities?.Medium || 0})`, value: 'Medium' },
+      { label: `High (${counts.priorities?.High || 0})`, value: 'High' },
+    ],
+  })
 
-const categories = createListCollection({
-  items: [
-    { label: 'Plumbing', value: 'Plumbing' },
-    { label: 'Electrical', value: 'Electrical' },
-    { label: 'AC', value: 'AC' },
-    { label: 'Other', value: 'Other' },
-  ],
-})
+const categories = (counts) =>
+  createListCollection({
+    items: [
+      { label: `Plumbing (${counts.categories?.Plumbing || 0})`, value: 'Plumbing' },
+      { label: `Electrical (${counts.categories?.Electrical || 0})`, value: 'Electrical' },
+      { label: `AC (${counts.categories?.AC || 0})`, value: 'AC' },
+      { label: `Other (${counts.categories?.Other || 0})`, value: 'Other' },
+    ],
+  })
 
-export default function RequestFilters({ filters, onChange }) {
+export default function RequestFilters({ filters, onChange, counts = {} }) {
   const set = (key) => (value) => {
     onChange({ ...filters, [key]: value })
   }
@@ -39,6 +42,10 @@ export default function RequestFilters({ filters, onChange }) {
       category: '',
     })
   }
+
+  const statusOptions = statuses(counts)
+  const priorityOptions = priorities(counts)
+  const categoryOptions = categories(counts)
 
   const hasFilters = Boolean(
     filters.search ||
@@ -53,12 +60,12 @@ export default function RequestFilters({ filters, onChange }) {
       value={filters[key] ? [filters[key]] : []}
       onValueChange={(details) => set(key)(details.value[0] || '')}
       width="180px"
-      
+
     >
       <Select.HiddenSelect />
       <Select.Control >
         <Select.Trigger bg="white" className='cursor-pointer'>
-          <Select.ValueText placeholder={label}  />
+          <Select.ValueText placeholder={label} />
         </Select.Trigger>
         <Select.IndicatorGroup>
           <Select.Indicator />
@@ -87,9 +94,9 @@ export default function RequestFilters({ filters, onChange }) {
         bg="white"
       />
 
-      {renderSelect('Status', 'status', statuses)}
-      {renderSelect('Priority', 'priority', priorities)}
-      {renderSelect('Category', 'category', categories)}
+      {renderSelect('Status', 'status', statusOptions)}
+      {renderSelect('Priority', 'priority', priorityOptions)}
+      {renderSelect('Category', 'category', categoryOptions)}
 
       <Button
         variant="ghost"

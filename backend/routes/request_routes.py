@@ -6,6 +6,7 @@ from schemas.request_schemas import (
 )
 from auth.deps import require_authentication
 from database import get_pool
+import json
 
 requests_bp = Blueprint("requests", url_prefix="/requests")
 
@@ -69,6 +70,39 @@ async def list_requests(request):
 
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *params)
+
+        counts = await conn.fetchrow("""
+            SELECT
+                (SELECT json_object_agg(status, total)
+                    FROM (
+                        SELECT status, COUNT(*) AS total
+                        FROM maintenance_requests
+                        GROUP BY status
+                    ) s) AS statuses,
+
+                (SELECT json_object_agg(priority, total)
+                    FROM (
+                        SELECT priority, COUNT(*) AS total
+                        FROM maintenance_requests
+                        GROUP BY priority
+                    ) p) AS priorities,
+
+                (SELECT json_object_agg(category, total)
+                    FROM (
+                        SELECT category, COUNT(*) AS total
+                        FROM maintenance_requests
+                        GROUP BY category
+                    ) c) AS categories
+        """)
+
+    return response.json({
+        "requests": [serialize(r) for r in rows],
+        "counts": {
+            "statuses": json.loads(counts["statuses"]) if isinstance(counts["statuses"], str) else (counts["statuses"] or {}),
+            "priorities": json.loads(counts["priorities"]) if isinstance(counts["priorities"], str) else (counts["priorities"] or {}),
+            "categories": json.loads(counts["categories"]) if isinstance(counts["categories"], str) else (counts["categories"] or {}),
+        },
+    })
 
     return response.json([serialize(r) for r in rows])
 
