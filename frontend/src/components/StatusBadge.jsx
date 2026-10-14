@@ -7,5 +7,9 @@ const COLORS = {
 }
 
 export default function StatusBadge({ status }) {
-  return <Badge colorScheme={COLORS[status] || 'gray'}>{status}</Badge>
+  return (
+    <Badge colorPalette={COLORS[status] || 'gray'} variant="surface">
+      {status || 'Unknown'}
+    </Badge>
+  )
 }

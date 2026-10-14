@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Box } from '@chakra-ui/react'
+
 import { useAuth } from './auth/AuthContext'
 import ProtectedRoute from './auth/ProtectedRoute'
+
+// components
 import Navbar from './components/Navbar'
+import { Box } from '@chakra-ui/react'
+
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -14,11 +18,11 @@ function AppLayout({ children }) {
   return (
     <Box minH="100vh" bg="gray.50">
       <Navbar />
-      <Box p={6}>{children}</Box>
+      
+      <Box p={16}>{children}</Box>
     </Box>
   )
 }
-
 function RootRedirect() {
   const { isAuthenticated } = useAuth()
   return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />

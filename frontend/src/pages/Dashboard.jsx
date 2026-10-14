@@ -35,7 +35,7 @@ export default function Dashboard() {
         )}
       </Flex>
 
-      <SimpleGrid columns={{ base: 2, md: user.role === 'manager' ? 5 : 4 }} spacing={4} mb={8}>
+      <SimpleGrid columns={{ base: 2, md: user.role === 'manager' ? 5 : 4 }}  gap={4} mb={8}>
         <SummaryCard label="Total Requests" value={all.length} accentColor="gray.500" />
         <SummaryCard label="Pending" value={pending} accentColor="yellow.400" />
         <SummaryCard label="In Progress" value={inProgress} accentColor="blue.400" />

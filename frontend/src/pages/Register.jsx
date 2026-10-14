@@ -3,13 +3,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
-  Box, Button, FormControl, FormLabel, Input, Select, FormErrorMessage,
-  Heading, VStack, Text, Link as ChakraLink, Alert, AlertIcon,
+  Box, Button, Field, Input, NativeSelect, Heading, Stack, Text, Link as ChakraLink, Alert,
 } from '@chakra-ui/react'
+import { CircleAlert } from 'lucide-react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { registerRequest } from '../api/auth'
 import { useAuth } from '../auth/AuthContext'
-
 const schema = z.object({
   name: z.string().min(1, 'Name is required').max(120),
   email: z.string().email('Enter a valid email'),
@@ -17,7 +16,6 @@ const schema = z.object({
   role: z.enum(['tenant', 'manager'], { errorMap: () => ({ message: 'Choose a role' }) }),
   unit_number: z.string().optional(),
 })
-
 export default function Register() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm({ resolver: zodResolver(schema) })
   const { login } = useAuth()
@@ -25,7 +23,6 @@ export default function Register() {
   const [apiError, setApiError] = useState('')
   const [loading, setLoading] = useState(false)
   const role = watch('role')
-
   const onSubmit = async (values) => {
     setApiError('')
     setLoading(true)
@@ -40,55 +37,61 @@ export default function Register() {
       setLoading(false)
     }
   }
-
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50" px={4} py={8}>
       <Box bg="white" p={8} borderRadius="lg" boxShadow="md" w="full" maxW="420px">
         <Heading size="lg" mb={6} textAlign="center">Create account</Heading>
         {apiError && (
-          <Alert status="error" mb={4} borderRadius="md">
-            <AlertIcon />
-            {apiError}
-          </Alert>
+          <Alert.Root status="error" mb={4} borderRadius="md">
+            <Alert.Indicator><CircleAlert size={18} /></Alert.Indicator>
+            <Alert.Content>
+              <Alert.Description>{apiError}</Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
         )}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack spacing={4}>
-            <FormControl isInvalid={!!errors.name}>
-              <FormLabel>Name</FormLabel>
-              <Input {...register('name')} />
-              <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.email}>
-              <FormLabel>Email</FormLabel>
-              <Input type="email" {...register('email')} />
-              <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.password}>
-              <FormLabel>Password</FormLabel>
-              <Input type="password" {...register('password')} />
-              <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.role}>
-              <FormLabel>Role</FormLabel>
-              <Select placeholder="Select role" {...register('role')}>
-                <option value="tenant">Tenant</option>
-                <option value="manager">Manager</option>
-              </Select>
-              <FormErrorMessage>{errors.role?.message}</FormErrorMessage>
-            </FormControl>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Stack gap={4}>
+            <Field.Root invalid={!!errors.name}>
+              <Field.Label>Name</Field.Label>
+              <Input autoComplete="name" {...register('name')} />
+              {errors.name && <Field.ErrorText>{errors.name.message}</Field.ErrorText>}
+            </Field.Root>
+            <Field.Root invalid={!!errors.email}>
+              <Field.Label>Email</Field.Label>
+              <Input type="email" autoComplete="email" {...register('email')} />
+              {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
+            </Field.Root>
+            <Field.Root invalid={!!errors.password}>
+              <Field.Label>Password</Field.Label>
+              <Input type="password" autoComplete="new-password" {...register('password')} />
+              {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
+            </Field.Root>
+            <Field.Root invalid={!!errors.role}>
+              <Field.Label>Role</Field.Label>
+              <NativeSelect.Root>
+                <NativeSelect.Field {...register('role')} defaultValue="" aria-label="Role">
+                  <option value="" disabled>Select role</option>
+                  <option value="tenant">Tenant</option>
+                  <option value="manager">Manager</option>
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+              {errors.role && <Field.ErrorText>{errors.role.message}</Field.ErrorText>}
+            </Field.Root>
             {role === 'tenant' && (
-              <FormControl>
-                <FormLabel>Unit number</FormLabel>
+              <Field.Root>
+                <Field.Label>Unit number</Field.Label>
                 <Input {...register('unit_number')} />
-              </FormControl>
+              </Field.Root>
             )}
-            <Button type="submit" colorScheme="blue" w="full" isLoading={loading}>
+            <Button type="submit" colorPalette="blue" w="full" loading={loading} disabled={loading}>
               Register
             </Button>
-          </VStack>
+          </Stack>
         </form>
         <Text mt={4} fontSize="sm" textAlign="center">
-          Already have an account? <ChakraLink as={RouterLink} to="/login" color="blue.500">Log in</ChakraLink>
+          Already have an account?{' '}
+          <ChakraLink as={RouterLink} to="/login" color="blue.500">Log in</ChakraLink>
         </Text>
       </Box>
     </Box>

@@ -7,5 +7,9 @@ const COLORS = {
 }
 
 export default function PriorityBadge({ priority }) {
-  return <Badge colorScheme={COLORS[priority] || 'gray'}>{priority}</Badge>
+  return (
+    <Badge colorPalette={COLORS[priority] || 'gray'} variant="subtle">
+      {priority || 'Unknown'}
+    </Badge>
+  )
 }

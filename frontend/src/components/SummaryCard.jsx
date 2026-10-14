@@ -1,5 +1,4 @@
-import { Box, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
-
+import { Box, Stat } from '@chakra-ui/react'
 export default function SummaryCard({ label, value, accentColor = 'gray.500' }) {
   return (
     <Box
@@ -11,10 +10,10 @@ export default function SummaryCard({ label, value, accentColor = 'gray.500' }) 
       borderTopWidth="4px"
       borderTopColor={accentColor}
     >
-      <Stat>
-        <StatLabel color="gray.500">{label}</StatLabel>
-        <StatNumber fontSize="3xl">{value}</StatNumber>
-      </Stat>
+      <Stat.Root>
+        <Stat.Label color="gray.500">{label}</Stat.Label>
+        <Stat.ValueText fontSize="3xl">{value}</Stat.ValueText>
+      </Stat.Root>
     </Box>
   )
 }
