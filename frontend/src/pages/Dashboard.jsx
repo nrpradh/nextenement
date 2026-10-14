@@ -9,13 +9,17 @@ import CategoryChart from '../components/CategoryChart'
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { data: requests, isLoading } = useRequestsList({})
+  const { data, isLoading } = useRequestsList({})
+
+  const requests = Array.isArray(data)
+    ? data
+    : data?.requests ?? []
 
   if (isLoading) {
     return <Flex justify="center" py={20}><Spinner size="xl" /></Flex>
   }
 
-  const all = requests || []
+  const all = requests 
   const pending = all.filter((r) => r.status === 'Pending').length
   const inProgress = all.filter((r) => r.status === 'In Progress').length
   const resolved = all.filter((r) => r.status === 'Resolved').length
@@ -35,7 +39,7 @@ export default function Dashboard() {
         )}
       </Flex>
 
-      <SimpleGrid columns={{ base: 2, md: user.role === 'manager' ? 5 : 4 }}  gap={4} mb={8}>
+      <SimpleGrid columns={{ base: 2, md: user.role === 'manager' ? 5 : 4 }} gap={4} mb={8}>
         <SummaryCard label="Total Requests" value={all.length} accentColor="gray.500" />
         <SummaryCard label="Pending" value={pending} accentColor="yellow.400" />
         <SummaryCard label="In Progress" value={inProgress} accentColor="blue.400" />
